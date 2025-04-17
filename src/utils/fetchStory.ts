@@ -10,7 +10,7 @@ export const fetchStory = async (
   const token = process.env.NEXT_PUBLIC_STORYBLOK_TOKEN;
 
   if (!token) {
-    console.error("❌ Storyblok API Token is missing");
+    console.error("Storyblok API Token is missing");
     return null;
   }
 
