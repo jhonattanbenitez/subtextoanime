@@ -31,8 +31,6 @@ const Hero: React.FunctionComponent<HeroProps> = ({ blok }) => {
         width={1000}
         height={1000}
       />
-
-
       <div className="absolute inset-0 bg-black/70 z-10" />
 
       {/* Contenido */}
