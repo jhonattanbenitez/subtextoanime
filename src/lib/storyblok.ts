@@ -5,6 +5,7 @@ import Teaser from "@/components/Teaser";
 import Hero from "@/components/Hero";
 import FeaturedPosts from "@/components/FeaturedPosts";
 import PostCard from "@/components/PostCard";
+import Post from "@/components/Post";
 
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
@@ -13,6 +14,7 @@ export const getStoryblokApi = storyblokInit({
     teaser: Teaser,
     hero: Hero,
     postCard: PostCard,
-    featured_posts: FeaturedPosts
+    featured_posts: FeaturedPosts,
+    post: Post
   },
 });
