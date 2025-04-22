@@ -4,6 +4,9 @@ import "./globals.css";
 import Navbar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import StoryblokProvider from "@/components/StoryblokProvider";
+import { Analytics } from "@vercel/analytics/react";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +60,9 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Footer />
+          <Analytics />
+          <GoogleAnalytics gaId="G-YNQD2MSEFJ" />
+          <SpeedInsights />
         </body>
       </StoryblokProvider>
     </html>
