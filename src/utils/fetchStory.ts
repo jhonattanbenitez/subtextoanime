@@ -26,8 +26,10 @@ export const fetchStory = async (
     const res = await fetch(
       `https://api.storyblok.com/v2/cdn/stories${correctSlug}?version=${version}&token=${token}`,
       {
-        next: { tags: ["cms"] },
-        cache: version === "published" ? "default" : "no-store",
+        next: {
+          tags: ["cms"],
+          revalidate: version === "published" ? 3600 : 0,
+        },
       }
     );
 
