@@ -5,7 +5,6 @@ import { fetchStories } from "@/utils/fetchStories";
 import Link from "next/link";
 import { Story } from "@/utils/types";
 import Image from "next/image";
-import NavBar from "@/components/NavBar";
 import formatDate from "@/utils/formatDate";
 
 export default function PostsPage() {
@@ -21,7 +20,6 @@ export default function PostsPage() {
       }
       setIsLoading(false);
     }
-
     getStories();
   }, []);
 
@@ -36,11 +34,20 @@ export default function PostsPage() {
   return (
     <section className="max-w-full">
       {/* Header Section */}
-      <NavBar />
-      <div className="bg-gray-900 w-full flex justify-center  py-32 mb-8 sm:py-48 lg:py-16">
-        <div className="relative w-full max-w-6xl lg:h-[50vh] flex items-center justify-center">
-          <h1 className="text-7xl font-bold text-white uppercase text-center">
-            Blog
+      <div className="relative w-full h-[60vh] mb-8">
+        {/* Imagen de fondo */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/articulos.png')" }}
+        />
+
+        {/* Overlay oscuro */}
+        <div className="absolute inset-0 bg-black overlay" />
+
+        {/* Contenido centrado */}
+        <div className="relative z-10 flex items-center justify-center h-full px-4">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white uppercase text-center">
+            Artículos
           </h1>
         </div>
       </div>
@@ -48,54 +55,58 @@ export default function PostsPage() {
       {/* Cards Grid */}
       <div className="container mx-auto p-4 bg-white">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stories.map((story, index) => (
-            <div
-              key={story.id}
-              className="p-4 rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 bg-gray-100 hover:bg-gray-900 group flex flex-col h-full"
-            >
-              <Link
-                href={`/articulos/${story.slug}`}
-                className="flex flex-col flex-grow"
+          {stories.map((story, index) => {
+            const { content, slug } = story;
+            const imageUrl = story.content.cover_image?.filename;
+            const title = content.title;
+            const intro = content.excerpt;
+            const date = story.published_at || story.created_at;
+
+            return (
+              <div
+                key={story.id}
+                className="p-4 rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 bg-gray-100 hover:bg-gray-900 group flex flex-col h-full"
               >
-                {/* Image */}
-                <div className="relative w-full mb-4 flex-shrink-0">
-                  {story.content.image?.[0]?.filename && (
-                    <Image
-                      src={
-                        story.content.image[0].filename +
-                        "/m/800x450/filters:format(webp):quality(80)/"
-                      }
-                      alt={story.name}
-                      width={800}
-                      height={450}
-                      priority={index === 0}
-                      className="object-cover rounded-sm"
-                    />
+                <Link
+                  href={`/articulos/${slug}`}
+                  className="flex flex-col flex-grow"
+                >
+                  {/* Image */}
+                  {imageUrl && (
+                    <div className="relative w-full mb-4 flex-shrink-0">
+                      <Image
+                        src={`${imageUrl}/m/800x450/filters:format(webp):quality(80)/`}
+                        alt={title}
+                        width={800}
+                        height={450}
+                        priority={index === 0}
+                        className="object-cover rounded-sm"
+                      />
+                    </div>
                   )}
-                </div>
 
-                {/* Title (Now correctly below the image) */}
-                <h2 className="text-xl font-semibold mb-2 uppercase group-hover:text-white">
-                  {story.content.title}
-                </h2>
+                  {/* Title */}
+                  <h2 className="text-xl font-semibold mb-2 uppercase group-hover:text-white">
+                    {title}
+                  </h2>
 
-                {/* Intro */}
-                <p className="text-gray-900 text-sm mb-2 leading-5 group-hover:text-gray-200">
-                  {story.content.intro}
-                </p>
-
-                {/* Spacer to push date to bottom */}
-                <div className="flex-grow"></div>
-
-                {/* Date (Aligned bottom-right using Flexbox) */}
-                <div className="flex justify-end">
-                  <p className="text-gray-900 text-xs group-hover:text-gray-300">
-                    {formatDate(story.content.date)}
+                  {/* Intro */}
+                  <p className="text-gray-900 text-sm mb-2 leading-5 group-hover:text-gray-200">
+                    {intro}
                   </p>
-                </div>
-              </Link>
-            </div>
-          ))}
+
+                  <div className="flex-grow"></div>
+
+                  {/* Date */}
+                  <div className="flex justify-end">
+                    <p className="text-gray-900 text-xs group-hover:text-gray-300">
+                      {formatDate(date)}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

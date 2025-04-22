@@ -14,6 +14,10 @@ export type ImageType = {
     source: string;
     copyright: string;
   };
+  cover_image: {
+    filename: string;
+    alt: string;
+  };
 };
 
 export type StoryContent = {
@@ -25,6 +29,11 @@ export type StoryContent = {
   title: string;
   content: string;
   component: string;
+  excerpt: string;
+  cover_image: {
+    filename: string;
+    alt: string;
+  };
 };
 
 export type Story = {

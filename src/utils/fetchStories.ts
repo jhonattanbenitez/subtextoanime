@@ -12,7 +12,7 @@ export const fetchStories = async (
 
   try {
     const response = await fetch(
-      `https://api.storyblok.com/v2/cdn/stories?starts_with=posts/&version=${version}&token=${token}`,
+      `https://api.storyblok.com/v2/cdn/stories?starts_with=articulos/&version=${version}&token=${token}`,
       {
         next: { tags: ["cms"] },
         cache: version === "published" ? "default" : "no-store",
@@ -26,7 +26,7 @@ export const fetchStories = async (
     const data = await response.json();
     return data as StoriesResponse;
   } catch (error) {
-    console.error("❌ Error fetching stories:", error);
+    console.error("Error fetching stories:", error);
     return null;
   }
 };
