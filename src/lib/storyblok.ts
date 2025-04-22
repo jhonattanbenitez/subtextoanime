@@ -1,4 +1,4 @@
-import { storyblokInit } from "@storyblok/react/rsc";
+import { storyblokInit, apiPlugin } from "@storyblok/react/rsc";
 
 import Page from "@/components/Page";
 import Teaser from "@/components/Teaser";
@@ -8,8 +8,9 @@ import PostCard from "@/components/PostCard";
 import Post from "@/components/Post";
 import Terms from "@/components/Terms";
 
-export const getStoryblokApi = storyblokInit({
+storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
+  use: [apiPlugin],
   components: {
     page: Page,
     teaser: Teaser,
