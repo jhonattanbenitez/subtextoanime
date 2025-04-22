@@ -5,7 +5,7 @@ import Navbar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import StoryblokProvider from "@/components/StoryblokProvider";
 import { Analytics } from "@vercel/analytics/react";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
@@ -58,10 +58,10 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Navbar />
+          <GoogleTagManager gtmId="GTM-W8Z9B23Z"  /> 
           {children}
           <Footer />
-          <Analytics />
-          <GoogleAnalytics gaId="G-YNQD2MSEFJ" />
+          <Analytics />   
           <SpeedInsights />
         </body>
       </StoryblokProvider>
