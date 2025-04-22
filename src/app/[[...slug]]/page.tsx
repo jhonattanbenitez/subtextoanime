@@ -1,4 +1,4 @@
-import "@/lib/storyblok"; // 👈 fuerza que se registre el init
+import "@/lib/storyblok";
 import { StoryblokStory } from "@storyblok/react/rsc";
 import { fetchStory } from "@/utils/fetchStory";
 
@@ -6,11 +6,13 @@ export async function generateStaticParams() {
   return [];
 }
 
-export default async function Page({
+export default async function SlugPage({
   params,
 }: {
-  params: { slug?: string[] };
+  params: Promise<{ slug?: string[] }>;
 }) {
-  const pageData = await fetchStory("draft", params.slug);
+  // Await the params object before accessing its properties
+  const resolvedParams = await params;
+  const pageData = await fetchStory("draft", resolvedParams.slug);
   return <StoryblokStory story={pageData?.story} />;
 }
