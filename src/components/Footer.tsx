@@ -22,12 +22,12 @@ const Footer = () => {
 
         {/* Enlaces */}
         <div className="flex space-x-6 text-slate-200">
-          <Link href="/sobre-nosotros" className="hover:text-white transition">
+          {/* <Link href="/sobre-nosotros" className="hover:text-white transition">
             Sobre nosotros
           </Link>
           <Link href="/contacto" className="hover:text-white transition">
             Contacto
-          </Link>
+          </Link> */}
           <Link href="/terminos" className="hover:text-white transition">
             Términos
           </Link>
