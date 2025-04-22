@@ -1,5 +1,6 @@
 import { SbBlokData, storyblokEditable } from "@storyblok/react/rsc";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface SbPostCardData extends SbBlokData {
@@ -10,6 +11,9 @@ interface SbPostCardData extends SbBlokData {
   category: string;
   title: string;
   published_at: string;
+  link: {
+    cached_url: string;
+  };
 }
 
 interface PostCardProps {
@@ -17,10 +21,12 @@ interface PostCardProps {
 }
 
 const PostCard: React.FunctionComponent<PostCardProps> = ({ blok }) => {
+    const href = blok.link?.cached_url ? `/${blok.link.cached_url}` : "#";
   return (
-    <article
+    <Link
+      href={href}
+      className="block bg-white rounded-2xl overflow-hidden shadow-lg transition hover:shadow-xl"
       {...storyblokEditable(blok)}
-      className="bg-white rounded-2xl overflow-hidden shadow-lg transition hover:shadow-xl"
     >
       {/* Imagen superior */}
       <div className="relative w-full h-56 sm:h-64 md:h-72 lg:h-80">
@@ -46,7 +52,7 @@ const PostCard: React.FunctionComponent<PostCardProps> = ({ blok }) => {
           })}
         </p>
       </div>
-    </article>
+    </Link>
   );
 };
 
