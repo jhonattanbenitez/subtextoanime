@@ -5,6 +5,7 @@ import formatDate from "@/utils/formatDate";
 import { ISbRichtext, RichTextResolver } from "@storyblok/react";
 
 import React from "react";
+import CommentSection from "./CommentSection";
 
 type CoverImageType = {
   filename: string;
@@ -16,6 +17,7 @@ type Blok = {
   content: ISbRichtext;
   cover_image?: CoverImageType;
   published_at: string | null;
+  post_uuid: string;
 };
 
 type PostProps = {
@@ -23,7 +25,8 @@ type PostProps = {
 };
 
 const Post: React.FC<PostProps> = ({ blok }) => {
-  const { slug } = useParams();
+  const params = useParams();
+  const slug = Array.isArray(params.slug) ? params.slug.join("/") : params.slug;
   const image = blok.cover_image?.filename ?? "";
   const date = blok.published_at
     ? formatDate(blok.published_at)
@@ -52,6 +55,7 @@ const Post: React.FC<PostProps> = ({ blok }) => {
         className="prose prose-neutral max-w-none"
         dangerouslySetInnerHTML={{ __html: html }}
       />
+      <CommentSection postId={blok.post_uuid} />
     </article>
   );
 };
