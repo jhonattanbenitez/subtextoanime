@@ -7,6 +7,7 @@ import StoryblokProvider from "@/components/StoryblokProvider";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SupabaseProvider } from "@/components/SupabaseProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,18 +52,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="es">
       <StoryblokProvider>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <SupabaseProvider>
           <Navbar />
           <GoogleTagManager gtmId="GTM-W8Z9B23Z"  /> 
           {children}
           <Footer />
           <Analytics />   
           <SpeedInsights />
+          </SupabaseProvider>
         </body>
       </StoryblokProvider>
     </html>
