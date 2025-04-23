@@ -34,7 +34,7 @@ const Hero: React.FunctionComponent<HeroProps> = ({ blok }) => {
       {/* <div className="absolute inset-0 bg-black/70 z-10" /> */}
 
       {/* Contenido */}
-      <div className="relative z-20 px-6 max-w-2xl py-32 sm:py-48 lg:py-56">
+      <div className="relative z-20 p-32 max-w-2xl  sm:py-48 lg:py-56">
         <h1 className="text-white text-4xl font-bold tracking-tight sm:text-6xl">
           {blok.title}
         </h1>
