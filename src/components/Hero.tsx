@@ -1,5 +1,6 @@
 import { SbBlokData, storyblokEditable } from "@storyblok/react/rsc";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface SbHeroData extends SbBlokData {
@@ -9,7 +10,9 @@ interface SbHeroData extends SbBlokData {
     filename: string;
     alt: string;
   };
-  cta_link: string;
+  cta_link: {
+     cached_url: string;
+  };
   cta_text: string;
 }
 
@@ -40,12 +43,12 @@ const Hero: React.FunctionComponent<HeroProps> = ({ blok }) => {
         </h1>
         <p className="mt-6 text-lg leading-8 text-white/80">{blok.subtitle}</p>
         {blok.cta_link && blok.cta_text && (
-          <a
-            href={blok.cta_link}
+          <Link
+            href={blok.cta_link.cached_url}
             className="mt-10 inline-block rounded-md bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-gray-200 transition"
           >
             {blok.cta_text}
-          </a>
+          </Link>
         )}
       </div>
     </section>
