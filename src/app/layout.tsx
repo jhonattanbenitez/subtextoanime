@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SupabaseProvider } from "@/components/SupabaseProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,6 +64,7 @@ export default function RootLayout({
           <Navbar />
           <GoogleTagManager gtmId="GTM-W8Z9B23Z"  /> 
           {children}
+          <Toaster />
           <Footer />
           <Analytics />   
           <SpeedInsights />

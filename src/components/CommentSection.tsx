@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { toast } from "sonner";
+
 
 interface Comment {
   id: number;
@@ -49,7 +51,7 @@ const fetchComments = useCallback(async () => {
 
   const handleSubmit = async () => {
     if (!user) {
-      alert("Debes iniciar sesión para comentar.");
+      toast.error("Debes iniciar sesión para comentar");
       return;
     }
 
@@ -62,7 +64,7 @@ const fetchComments = useCallback(async () => {
     ]);
 
     if (error) {
-      alert("Error al comentar: " + error.message);
+      toast.error("Error al comentar: " + error.message);
     } else {
       setComment("");
       fetchComments();
@@ -91,7 +93,7 @@ const fetchComments = useCallback(async () => {
         {comments.map((c) => (
           <div key={c.id} className="p-4 bg-white rounded shadow border">
             <p className="text-sm text-gray-500">
-              {c.profiles?.full_name || "Usuario anónimo"} comentó el{" "}
+              {c.profiles?.full_name ?? "Usuario anónimo"} comentó el{" "}
               {new Date(c.created_at).toLocaleString()}
             </p>
 

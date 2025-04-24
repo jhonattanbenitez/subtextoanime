@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function AuthForm() {
   const supabase = useSupabaseClient();
@@ -16,7 +17,7 @@ export default function AuthForm() {
       password,
     });
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
     } else {
       router.push("/dashboard");
     }
@@ -24,7 +25,7 @@ export default function AuthForm() {
 
   const handleSignUp = async () => {
     const { error } = await supabase.auth.signUp({ email, password });
-    if (error) alert(error.message);
+    if (error) toast.error(error.message);
   };
 
   const handleGoogleLogin = async () => {
