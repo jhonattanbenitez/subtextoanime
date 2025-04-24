@@ -37,8 +37,8 @@ export default function PerfilPage() {
 
       // Get the name from user metadata (from Google auth)
       const fullName =
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
+        user?.user_metadata?.full_name ??
+        user?.user_metadata?.name ??
         "Anonymous User";
 
       // Create a profile

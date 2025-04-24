@@ -20,30 +20,30 @@ export default function CommentSection({ postId }: { postId: string }) {
   const user = useUser();
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
+  const [editingComment, setEditingComment] = useState<Comment | null>(null);
+  const [editedText, setEditedText] = useState("");
 
-const fetchComments = useCallback(async () => {
-  const { data, error } = await supabase
-    .from("comments")
-    .select(
+  const fetchComments = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("comments")
+      .select(
+        `
+        id,
+        text,
+        created_at,
+        user_id,
+        profiles!user_id (full_name)
       `
-    id,
-    text,
-    created_at,
-    user_id,
-    profiles!user_id (full_name)
-  `
-    )
-    .eq("post_id", postId)
-    .order("created_at", { ascending: false });
+      )
+      .eq("post_id", postId)
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error(error);
-  } else {
-    setComments(data as Comment[]);
-  }
-}, [supabase, postId]);
-
-
+    if (error) {
+      console.error(error);
+    } else {
+      setComments(data as Comment[]);
+    }
+  }, [supabase, postId]);
 
   useEffect(() => {
     if (postId) fetchComments();
@@ -67,6 +67,40 @@ const fetchComments = useCallback(async () => {
       toast.error("Error al comentar: " + error.message);
     } else {
       setComment("");
+      fetchComments();
+    }
+  };
+
+  const handleEdit = (comment: Comment) => {
+    setEditingComment(comment);
+    setEditedText(comment.text);
+  };
+
+  const handleUpdate = async () => {
+    if (!editingComment) return;
+
+    const { error } = await supabase
+      .from("comments")
+      .update({ text: editedText })
+      .eq("id", editingComment.id);
+
+    if (error) {
+      toast.error("Error al actualizar comentario: " + error.message);
+    } else {
+      toast.success("Comentario actualizado");
+      setEditingComment(null);
+      setEditedText("");
+      fetchComments();
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    const { error } = await supabase.from("comments").delete().eq("id", id);
+
+    if (error) {
+      toast.error("Error al borrar comentario: " + error.message);
+    } else {
+      toast.success("Comentario borrado");
       fetchComments();
     }
   };
@@ -97,7 +131,56 @@ const fetchComments = useCallback(async () => {
               {new Date(c.created_at).toLocaleString()}
             </p>
 
-            <p>{c.text}</p>
+            {editingComment?.id === c.id ? (
+              <div>
+                <label htmlFor="edit-comment" className="sr-only">Editar comentario</label>
+                <textarea
+                  id="edit-comment"
+                  className="w-full p-2 border rounded mt-2"
+                  rows={3}
+                  value={editedText}
+                  onChange={(e) => setEditedText(e.target.value)}
+                  placeholder="Editar comentario..."
+                  aria-label="Editar comentario"
+                />
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={handleUpdate}
+                    className="text-green-600 font-medium"
+                  >
+                    Guardar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingComment(null);
+                      setEditedText("");
+                    }}
+                    className="text-gray-500"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-2">{c.text}</p>
+            )}
+
+            {user?.id === c.user_id && editingComment?.id !== c.id && (
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => handleEdit(c)}
+                  className="text-blue-500 hover:underline text-sm"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(c.id)}
+                  className="text-red-500 hover:underline text-sm"
+                >
+                  Borrar
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
