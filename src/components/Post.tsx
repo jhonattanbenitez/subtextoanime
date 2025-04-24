@@ -1,12 +1,12 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import formatDate from "@/utils/formatDate";
-import { ISbRichtext, RichTextResolver } from "@storyblok/react";
 import Script from "next/script";
-
 import React from "react";
 import CommentSection from "./CommentSection";
+import RichTextRenderer from "./RichTextRenderer";
 
 type CoverImageType = {
   filename: string;
@@ -15,7 +15,8 @@ type CoverImageType = {
 type Blok = {
   title: string;
   excerpt: string;
-  content: ISbRichtext;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content: any; 
   cover_image?: CoverImageType;
   published_at: string | null;
   post_uuid: string;
@@ -33,9 +34,6 @@ const Post: React.FC<PostProps> = ({ blok }) => {
     ? formatDate(blok.published_at)
     : "Sin fecha de publicación";
 
-  const renderer = new RichTextResolver();
-  const html = renderer.render(blok.content);
-
   return (
     <article className="w-full max-w-2xl mx-auto px-4 py-8" data-slug={slug}>
       <Script
@@ -46,16 +44,17 @@ const Post: React.FC<PostProps> = ({ blok }) => {
             "@context": "https://schema.org",
             "@type": "Article",
             headline: blok.title,
-            image: [blok.cover_image?.filename ?? ""],
+            image: [image],
             datePublished: blok.published_at,
             author: {
               "@type": "Person",
-              name: "Subtexto Anime", 
+              name: "Subtexto Anime",
             },
             description: blok.excerpt,
           }),
         }}
       />
+
       <h1 className="text-3xl font-bold mb-4">{blok.title}</h1>
       <p className="text-gray-500 mb-4">{date}</p>
 
@@ -70,10 +69,7 @@ const Post: React.FC<PostProps> = ({ blok }) => {
         />
       )}
       <p className="text-gray-700 mb-4">{blok.excerpt}</p>
-      <div
-        className="prose prose-neutral max-w-none"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <RichTextRenderer content={blok.content} />
       <CommentSection postId={blok.post_uuid} />
     </article>
   );
