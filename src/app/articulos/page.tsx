@@ -130,7 +130,7 @@ export default function PostsPage() {
 
         {/* Contenido centrado */}
         <div className="relative z-10 flex items-center justify-center h-full px-4">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white uppercase text-center">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-[#ff2d95] uppercase text-center">
             Artículos
           </h1>
         </div>
