@@ -8,6 +8,7 @@ import PostCard from "@/components/PostCard";
 import Post from "@/components/Post";
 import Terms from "@/components/Terms";
 import AuthForm from "@/components/AuthForm";
+import LatestPosts from "@/components/LatestPosts";
 
 storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
@@ -20,6 +21,7 @@ storyblokInit({
     featured_posts: FeaturedPosts,
     post: Post,
     terms: Terms,
-    auth_form: AuthForm
+    auth_form: AuthForm,
+    latest_posts: LatestPosts,
   },
 });
