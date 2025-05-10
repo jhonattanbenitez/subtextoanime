@@ -21,11 +21,11 @@ interface PostCardProps {
 }
 
 const PostCard: React.FunctionComponent<PostCardProps> = ({ blok }) => {
-    const href = blok.link?.cached_url ? `/${blok.link.cached_url}` : "#";
+  const href = blok.link?.cached_url ? `/${blok.link.cached_url}` : "#";
   return (
     <Link
       href={href}
-      className="block bg-white rounded-2xl overflow-hidden shadow-lg transition hover:shadow-xl"
+      className="block bg-white rounded-2xl overflow-hidden shadow-lg transition hover:shadow-xl h-full flex flex-col"
       {...storyblokEditable(blok)}
     >
       {/* Imagen superior */}
@@ -38,13 +38,15 @@ const PostCard: React.FunctionComponent<PostCardProps> = ({ blok }) => {
         />
       </div>
 
-      {/* Contenido */}
-      <div className="p-6">
-        <span className="text-xs font-semibold uppercase text-pink-600 tracking-wider">
-          {blok.category}
-        </span>
-        <h2 className="mt-2 text-xl font-bold text-gray-900">{blok.title}</h2>
-        <p className="mt-2 text-sm text-gray-500">
+      <div className="p-6 flex flex-col flex-grow">
+        <div>
+          <span className="text-xs font-semibold uppercase text-pink-600 tracking-wider">
+            {blok.category}
+          </span>
+          <h2 className="mt-2 text-xl font-bold text-gray-900">{blok.title}</h2>
+        </div>
+
+        <p className="mt-auto pt-4 text-sm text-gray-500">
           {new Date(blok.published_at).toLocaleDateString("es-CO", {
             year: "numeric",
             month: "long",
