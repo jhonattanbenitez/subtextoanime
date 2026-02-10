@@ -27,44 +27,52 @@ const Hero: React.FunctionComponent<HeroProps> = ({ blok }) => {
   return (
     <section
       {...storyblokEditable(blok)}
-      className="relative flex min-h-screen w-full"
+      className="relative flex min-h-[80vh] w-full overflow-hidden group"
     >
       {/* Imagen de fondo o Skeleton */}
       {isLoading ? (
         <Skeleton className="absolute inset-0 h-full w-full z-0" />
       ) : (
-        <Image
-          src={blok.image.filename}
-          alt={blok.image.alt}
-          className="absolute inset-0 h-full w-full object-cover z-0"
-          width={1000}
-          height={1000}
-        />
+        <div className="absolute inset-0 h-full w-full z-0">
+          <Image
+            src={blok.image.filename}
+            alt={blok.image.alt}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            width={1920}
+            height={1080}
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+        </div>
       )}
 
       {/* Contenido */}
-      <div className="relative z-20 p-32 max-w-2xl sm:py-48 lg:py-56 space-y-6">
+      <div className="relative z-20 flex flex-col justify-end p-8 sm:p-16 lg:p-24 max-w-4xl w-full mt-auto mb-12">
         {isLoading ? (
-          <>
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-10 w-40" />
-          </>
+          <div className="space-y-4">
+            <Skeleton className="h-16 w-3/4" />
+            <Skeleton className="h-6 w-1/2" />
+            <Skeleton className="h-12 w-40" />
+          </div>
         ) : (
-          <>
-            <h1 className="text-white text-4xl font-bold tracking-tight sm:text-6xl">
+          <div className="space-y-4">
+            <h1 className="text-white text-6xl sm:text-8xl font-bebas uppercase tracking-wide drop-shadow-xl">
               {blok.title}
             </h1>
-            <p className="text-lg leading-8 text-white/80">{blok.subtitle}</p>
+            <p className="text-xl sm:text-2xl text-gray-200 font-light max-w-2xl drop-shadow-md">
+              {blok.subtitle}
+            </p>
             {blok.cta_link && blok.cta_text && (
-              <Link
-                href={blok.cta_link.cached_url}
-                className="inline-block rounded-md bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-gray-200 transition"
-              >
-                {blok.cta_text}
-              </Link>
+              <div className="pt-4">
+                <Link
+                  href={blok.cta_link.cached_url}
+                  className="inline-block px-8 py-3 bg-primary text-white font-bold uppercase tracking-widest text-sm hover:bg-white hover:text-black transition-colors duration-300 shadow-lg"
+                >
+                  {blok.cta_text}
+                </Link>
+              </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </section>

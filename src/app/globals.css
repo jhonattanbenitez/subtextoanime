@@ -132,7 +132,7 @@ body {
 /* Optional: Custom bullet for unordered lists */
 /* Unordered list bullets */
 .prose ul > li::marker {
-  content: "• "; 
+  content: "• ";
   color: #3b82f6; /* Tailwind blue-500 */
   font-weight: bold;
   font-size: 1.1em;
@@ -162,9 +162,7 @@ body {
 }
 
 .overlay {
-
   background-color: rgba(0, 0, 0, 0.7);
-
 }
 
 @theme inline {
@@ -280,5 +278,42 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Otaku Theme Utilities */
+@layer utilities {
+  .font-bebas {
+    font-family: "Bebas Neue", san-serif;
+  }
+
+  .drop-cap::first-letter {
+    float: left;
+    font-size: 3.5rem;
+    line-height: 3rem;
+    font-weight: bold;
+    margin-right: 0.75rem;
+    font-family: "Bebas Neue", display;
+    color: var(--primary);
+  }
+
+  .link-hover {
+    position: relative;
+    display: inline-block;
+  }
+
+  .link-hover::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: currentColor;
+    transition: width 0.3s ease;
+  }
+
+  .link-hover:hover::after {
+    width: 100%;
   }
 }

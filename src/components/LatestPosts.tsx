@@ -1,7 +1,8 @@
 import { SbBlokData, storyblokEditable } from "@storyblok/react/rsc";
-import PostCard from "./PostCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchLatestPosts } from "@/utils/fetchLatestPosts";
+import AnimeCard from "./AnimeCard";
+import ScrollReveal from "./ScrollReveal";
 
 interface SbPostCardData extends SbBlokData {
   image: {
@@ -37,18 +38,15 @@ const LatestPosts = async ({ blok }: LatestPostsProps) => {
 
       return {
         _uid: story.uuid,
-        // Map the image data to match PostCard's expected structure
-        image: {
-          filename: coverImage?.filename || "",
-          alt: coverImage?.alt || story.content.title || "Article image",
-        },
-        category: "Opinión",
+        image: coverImage?.filename || "",
         title: story.content.title,
-        published_at: story.published_at,
-        component: "post_card",
-        link: {
-          cached_url: story.full_slug,
-        },
+        slug: story.full_slug,
+        category: "Opinión", // Could be dynamic if story has category field
+        date: new Date(story.published_at).toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
       };
     }) || [];
 
@@ -60,9 +58,11 @@ const LatestPosts = async ({ blok }: LatestPostsProps) => {
       className="w-full pb-16 px-6 max-w-7xl mx-auto"
     >
       {blok.title && (
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          {blok.title}
-        </h2>
+        <ScrollReveal>
+          <h2 className="text-4xl font-bebas text-foreground mb-8 text-center uppercase tracking-wider">
+            {blok.title}
+          </h2>
+        </ScrollReveal>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -75,7 +75,17 @@ const LatestPosts = async ({ blok }: LatestPostsProps) => {
                 <Skeleton className="h-5 w-2/3" />
               </div>
             ))
-          : posts.map((post) => <PostCard blok={post} key={post._uid} />)}
+          : posts.map((post, index) => (
+              <ScrollReveal key={post._uid} delay={index * 0.1}>
+                <AnimeCard
+                  title={post.title}
+                  image={post.image}
+                  slug={post.slug}
+                  category={post.category}
+                  date={post.date}
+                />
+              </ScrollReveal>
+            ))}
       </div>
     </section>
   );

@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabaseClient"; // Ajusta si está en otra ruta
-import { User } from '@supabase/supabase-js';
+import { User } from "@supabase/supabase-js";
 
 const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -50,16 +50,25 @@ const Navbar = () => {
 
       {/* Links + User Menu */}
       <div className="flex items-center space-x-6 text-sm font-medium text-gray-700">
-        <Link href="/" className="hover:text-black transition-colors">
+        <Link
+          href="/"
+          className="link-hover hover:text-primary transition-colors uppercase tracking-widest"
+        >
           Inicio
         </Link>
-        <Link href="/articulos" className="hover:text-black transition-colors">
+        <Link
+          href="/articulos"
+          className="link-hover hover:text-primary transition-colors uppercase tracking-widest"
+        >
           Artículos
         </Link>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="text-sm">
+            <Button
+              variant="outline"
+              className="text-sm uppercase tracking-widest hover:bg-primary hover:text-white transition-colors"
+            >
               Usuario
             </Button>
           </DropdownMenuTrigger>

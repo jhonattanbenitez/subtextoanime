@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bebas_Neue, Roboto } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -17,6 +17,18 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const bebasNeue = Bebas_Neue({
+  weight: "400",
+  variable: "--font-bebas",
+  subsets: ["latin"],
+});
+
+const roboto = Roboto({
+  weight: ["400", "500", "700"],
+  variable: "--font-roboto",
   subsets: ["latin"],
 });
 
@@ -47,27 +59,25 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="es">
       <StoryblokProvider>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} ${roboto.variable} antialiased font-roboto`}
         >
           <SupabaseProvider>
-          <Navbar />
-          <GoogleTagManager gtmId="GTM-W8Z9B23Z"  /> 
-          {children}
-          <Toaster />
-          <Footer />
-          <Analytics />   
-          <SpeedInsights />
+            <Navbar />
+            <GoogleTagManager gtmId="GTM-W8Z9B23Z" />
+            {children}
+            <Toaster />
+            <Footer />
+            <Analytics />
+            <SpeedInsights />
           </SupabaseProvider>
         </body>
       </StoryblokProvider>
