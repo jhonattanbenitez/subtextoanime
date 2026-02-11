@@ -11,9 +11,9 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug?: string[] }>;
 }) {
- const resolvedParams = await params;
- const slug = resolvedParams.slug || ["home"];
- const story = await fetchStory("draft", slug);
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug || ["home"];
+  const story = await fetchStory("draft", slug);
 
   if (!story?.story) return {};
 
@@ -65,5 +65,10 @@ export default async function SlugPage({
   // Await the params object before accessing its properties
   const resolvedParams = await params;
   const pageData = await fetchStory("draft", resolvedParams.slug);
+
+  if (pageData?.story?.content) {
+    pageData.story.content.post_uuid = pageData.story.uuid;
+  }
+
   return <StoryblokStory story={pageData?.story} />;
 }

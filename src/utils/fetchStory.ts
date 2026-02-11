@@ -1,7 +1,7 @@
 type StoryblokResponse = {
   story: {
     name: string;
-    content: string;
+    content: any;
     slug: string;
     created_at: string;
     published_at: string;
@@ -12,7 +12,7 @@ type StoryblokResponse = {
 
 export const fetchStory = async (
   version: "draft" | "published",
-  slug?: string[]
+  slug?: string[],
 ): Promise<StoryblokResponse | null> => {
   const correctSlug = `/${slug ? slug.join("/") : "home"}`;
   const token = process.env.NEXT_PUBLIC_STORYBLOK_TOKEN;
@@ -30,7 +30,7 @@ export const fetchStory = async (
           tags: ["cms"],
           revalidate: version === "published" ? 3600 : 0,
         },
-      }
+      },
     );
 
     if (!res.ok) {
