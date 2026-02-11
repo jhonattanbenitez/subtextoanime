@@ -1,95 +1,61 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { useSession, signOut, signIn } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-interface Profile {
-  id: string;
-  full_name?: string;
-  created_at?: string;
-}
+import Image from "next/image";
 
 export default function PerfilPage() {
-  const supabase = useSupabaseClient();
-  const user = useUser();
-  const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    if (user) {
-      fetchOrCreateProfile();
-    } else {
-      setLoading(false); // detener loading si no hay usuario
-    }
-  }, [user]);
+  if (status === "loading")
+    return <p className="p-4 text-center">Cargando perfil...</p>;
 
-  const fetchOrCreateProfile = async () => {
-    setLoading(true);
-    // eslint-disable-next-line prefer-const
-    let { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user?.id)
-      .single();
-
-    if (error || !data) {
-      const fullName =
-        user?.user_metadata?.full_name ??
-        user?.user_metadata?.name ??
-        "Usuario Anónimo";
-
-      const { data: newProfile, error: insertError } = await supabase
-        .from("profiles")
-        .insert([{ id: user?.id, full_name: fullName }])
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error("Error al crear el perfil:", insertError);
-      } else {
-        data = newProfile;
-      }
-    }
-
-    setProfile(data);
-    setLoading(false);
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  };
-
-  if (loading) return <p className="p-4">Cargando perfil...</p>;
-
-  if (!user) {
+  if (!session?.user) {
     return (
-      <div className="p-4 text-center">
+      <div className="p-4 text-center mt-20">
         <p className="mb-4 text-lg">No has iniciado sesión.</p>
-        <Link href="/login">
-          <Button>Iniciar sesión</Button>
-        </Link>
+        <Button onClick={() => signIn()}>Iniciar sesión</Button>
       </div>
     );
   }
 
   return (
-    <div className="p-4 max-w-md mx-auto max-h-screen my-30">
+    <div className="p-4 max-w-md mx-auto my-30">
       <Card>
         <CardHeader>
           <CardTitle className="text-xl">Perfil de Usuario</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-          <p>
-            <strong>Nombre:</strong> {profile?.full_name ?? "No especificado"}
-          </p>
-          <Button variant="destructive" onClick={handleLogout}>
+        <CardContent className="space-y-4">
+          <div className="flex justify-center">
+            {session.user.image ? (
+              <Image
+                src={session.user.image}
+                alt={session.user.name || "User"}
+                width={100}
+                height={100}
+                className="rounded-full"
+              />
+            ) : (
+              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-2xl font-bold text-gray-500">
+                {session.user.name?.[0] || "U"}
+              </div>
+            )}
+          </div>
+          <div className="text-center space-y-2">
+            <p>
+              <strong>Nombre:</strong> {session.user.name || "No especificado"}
+            </p>
+            <p>
+              <strong>Email:</strong> {session.user.email}
+            </p>
+          </div>
+          <Button
+            variant="destructive"
+            onClick={() => signOut()}
+            className="w-full"
+          >
             Cerrar sesión
           </Button>
         </CardContent>

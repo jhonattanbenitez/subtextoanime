@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,24 +11,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { supabase } from "@/lib/supabaseClient"; // Ajusta si está en otra ruta
-import { User } from "@supabase/supabase-js";
+import { useSession, signOut, signIn } from "next-auth/react";
 
 const Navbar = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { data: session } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-    };
-    getUser();
-  }, []);
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
+    await signOut();
     router.refresh();
   };
 
@@ -69,11 +59,13 @@ const Navbar = () => {
               variant="outline"
               className="text-sm uppercase tracking-widest hover:bg-primary hover:text-white transition-colors"
             >
-              Usuario
+              {session?.user?.name
+                ? session.user.name.split(" ")[0]
+                : "Usuario"}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {user ? (
+            {session ? (
               <>
                 <DropdownMenuItem onClick={() => router.push("/perfil")}>
                   Perfil
@@ -83,7 +75,7 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </>
             ) : (
-              <DropdownMenuItem onClick={() => router.push("/login")}>
+              <DropdownMenuItem onClick={() => signIn()}>
                 Iniciar sesión
               </DropdownMenuItem>
             )}

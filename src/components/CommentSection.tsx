@@ -1,188 +1,210 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { useEffect, useState, useTransition } from "react";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-
+import {
+  createComment,
+  getComments,
+  deleteComment,
+  updateComment,
+} from "@/actions/comments";
+import Image from "next/image";
 
 interface Comment {
-  id: number;
+  id: string;
   text: string;
-  created_at: string;
-  user_id: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  profiles: any;
+  createdAt: Date;
+  userId: string;
+  user: {
+    name: string | null;
+    image: string | null;
+  };
 }
 
-
 export default function CommentSection({ postId }: { postId: string }) {
-  const supabase = useSupabaseClient();
-  const user = useUser();
-  const [comment, setComment] = useState("");
+  const { data: session } = useSession();
   const [comments, setComments] = useState<Comment[]>([]);
-  const [editingComment, setEditingComment] = useState<Comment | null>(null);
+  const [newComment, setNewComment] = useState("");
+  const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editedText, setEditedText] = useState("");
+  const [isPending, startTransition] = useTransition();
 
-  const fetchComments = useCallback(async () => {
-    const { data, error } = await supabase
-      .from("comments")
-      .select(
-        `
-        id,
-        text,
-        created_at,
-        user_id,
-        profiles!user_id (full_name)
-      `
-      )
-      .eq("post_id", postId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error(error);
-    } else {
-      setComments(data as Comment[]);
+  const loadComments = async () => {
+    const result = await getComments(postId);
+    if (result.success && result.data) {
+      setComments(result.data as unknown as Comment[]);
     }
-  }, [supabase, postId]);
+  };
 
   useEffect(() => {
-    if (postId) fetchComments();
-  }, [fetchComments, postId]);
+    loadComments();
+  }, [postId]);
 
-  const handleSubmit = async () => {
-    if (!user) {
+  const handleSubmit = () => {
+    if (!session) {
       toast.error("Debes iniciar sesión para comentar");
       return;
     }
 
-    const { error } = await supabase.from("comments").insert([
-      {
-        user_id: user.id,
-        text: comment,
-        post_id: postId,
-      },
-    ]);
-
-    if (error) {
-      toast.error("Error al comentar: " + error.message);
-    } else {
-      setComment("");
-      fetchComments();
-    }
+    startTransition(async () => {
+      const result = await createComment(postId, newComment);
+      if (result.success) {
+        setNewComment("");
+        await loadComments();
+        toast.success("Comentario publicado");
+      } else {
+        toast.error(result.error || "Error al comentar");
+      }
+    });
   };
 
-  const handleEdit = (comment: Comment) => {
-    setEditingComment(comment);
-    setEditedText(comment.text);
-  };
-
-  const handleUpdate = async () => {
+  const handleUpdate = () => {
     if (!editingComment) return;
 
-    const { error } = await supabase
-      .from("comments")
-      .update({ text: editedText })
-      .eq("id", editingComment.id);
-
-    if (error) {
-      toast.error("Error al actualizar comentario: " + error.message);
-    } else {
-      toast.success("Comentario actualizado");
-      setEditingComment(null);
-      setEditedText("");
-      fetchComments();
-    }
+    startTransition(async () => {
+      const result = await updateComment(editingComment, editedText);
+      if (result.success) {
+        setEditingComment(null);
+        setEditedText("");
+        await loadComments();
+        toast.success("Comentario actualizado");
+      } else {
+        toast.error(result.error || "Error al actualizar");
+      }
+    });
   };
 
-  const handleDelete = async (id: number) => {
-    const { error } = await supabase.from("comments").delete().eq("id", id);
+  const handleDelete = (id: string) => {
+    if (!confirm("¿Estás seguro de borrar este comentario?")) return;
 
-    if (error) {
-      toast.error("Error al borrar comentario: " + error.message);
-    } else {
-      toast.success("Comentario borrado");
-      fetchComments();
-    }
+    startTransition(async () => {
+      const result = await deleteComment(id);
+      if (result.success) {
+        await loadComments();
+        toast.success("Comentario borrado");
+      } else {
+        toast.error(result.error || "Error al borrar");
+      }
+    });
   };
 
   return (
-    <div className="space-y-4 max-w-xl mx-auto">
-      <h2 className="text-xl font-bold">Comentarios</h2>
+    <div className="space-y-6 max-w-2xl mx-auto py-8">
+      <h2 className="text-2xl font-bold font-bebas tracking-wide">
+        Comentarios
+      </h2>
 
-      <textarea
-        className="w-full p-2 border border-gray-300 rounded"
-        rows={3}
-        placeholder="Escribe tu comentario..."
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
-      <button
-        onClick={handleSubmit}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        Enviar
-      </button>
+      {/* Input Area */}
+      <div className="space-y-3">
+        <textarea
+          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
+          rows={3}
+          placeholder={
+            session ? "Escribe tu opinión..." : "Inicia sesión para comentar"
+          }
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          disabled={!session || isPending}
+        />
+        <div className="flex justify-end">
+          <button
+            onClick={handleSubmit}
+            disabled={!session || isPending || !newComment.trim()}
+            className="bg-primary text-white px-6 py-2 rounded-full text-sm font-medium uppercase tracking-wider hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isPending ? "Publicando..." : "Enviar Comentario"}
+          </button>
+        </div>
+      </div>
 
-      <div className="mt-6 space-y-4">
+      {/* Comments List */}
+      <div className="space-y-6">
         {comments.map((c) => (
-          <div key={c.id} className="p-4 bg-white rounded shadow border">
-            <p className="text-sm text-gray-500">
-              {c.profiles?.full_name ?? "Usuario anónimo"} comentó el{" "}
-              {new Date(c.created_at).toLocaleString()}
-            </p>
-
-            {editingComment?.id === c.id ? (
-              <div>
-                <label htmlFor="edit-comment" className="sr-only">Editar comentario</label>
-                <textarea
-                  id="edit-comment"
-                  className="w-full p-2 border rounded mt-2"
-                  rows={3}
-                  value={editedText}
-                  onChange={(e) => setEditedText(e.target.value)}
-                  placeholder="Editar comentario..."
-                  aria-label="Editar comentario"
+          <div key={c.id} className="flex gap-4 p-4 bg-gray-50 rounded-xl">
+            <div className="flex-shrink-0">
+              {c.user.image ? (
+                <Image
+                  src={c.user.image}
+                  alt={c.user.name || "User"}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
                 />
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={handleUpdate}
-                    className="text-green-600 font-medium"
-                  >
-                    Guardar
-                  </button>
+              ) : (
+                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                  {c.user.name?.[0]?.toUpperCase() || "U"}
+                </div>
+              )}
+            </div>
+
+            <div className="flex-grow space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-gray-900">
+                  {c.user.name || "Usuario Anónimo"}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {new Date(c.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+
+              {editingComment === c.id ? (
+                <div className="space-y-2 mt-2">
+                  <textarea
+                    className="w-full p-2 border rounded-md text-sm"
+                    rows={2}
+                    value={editedText}
+                    onChange={(e) => setEditedText(e.target.value)}
+                  />
+                  <div className="flex gap-2 text-xs">
+                    <button
+                      onClick={handleUpdate}
+                      className="text-green-600 font-bold hover:underline"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      onClick={() => setEditingComment(null)}
+                      className="text-gray-500 hover:underline"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  {c.text}
+                </p>
+              )}
+
+              {/* Actions */}
+              {session?.user?.id === c.userId && editingComment !== c.id && (
+                <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => {
-                      setEditingComment(null);
-                      setEditedText("");
+                      setEditingComment(c.id);
+                      setEditedText(c.text);
                     }}
-                    className="text-gray-500"
+                    className="text-xs text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    Cancelar
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(c.id)}
+                    className="text-xs text-red-600 hover:text-red-800 font-medium"
+                  >
+                    Borrar
                   </button>
                 </div>
-              </div>
-            ) : (
-              <p className="mt-2">{c.text}</p>
-            )}
-
-            {user?.id === c.user_id && editingComment?.id !== c.id && (
-              <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => handleEdit(c)}
-                  className="text-blue-500 hover:underline text-sm"
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDelete(c.id)}
-                  className="text-red-500 hover:underline text-sm"
-                >
-                  Borrar
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         ))}
+        {comments.length === 0 && (
+          <p className="text-center text-gray-400 italic py-4">
+            Sé el primero en comentar.
+          </p>
+        )}
       </div>
     </div>
   );

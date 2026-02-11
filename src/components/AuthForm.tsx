@@ -1,6 +1,6 @@
 "use client";
 
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,16 +16,12 @@ export default function AuthForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const supabase = useSupabaseClient();
-
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${location.origin}/perfil`,
-      },
-    });
-    if (error) toast.error(error.message);
+    try {
+      await signIn("google", { callbackUrl: "/perfil" });
+    } catch (error) {
+      toast.error("Error al iniciar sesión");
+    }
   };
 
   return (
